@@ -1,0 +1,15 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.8
+pydantic-settings>=2.4
+langgraph>=1.0
+langchain-core>=1.0
+langchain-text-splitters>=1.0
+langchain-chroma>=1.0
+chromadb>=1.0
+fastembed>=0.5
+# LLM providers (only the configured one is used at runtime)
+langchain-groq>=1.0
+langchain-openai>=1.0
+langchain-anthropic>=1.0
+langchain-ollama>=1.0

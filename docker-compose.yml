@@ -1,0 +1,23 @@
+services:
+  backend:
+    build: ./backend
+    env_file:
+      - path: ./backend/.env
+        required: false
+    environment:
+      CLAIMS_DB_PATH: /app/state/mock_claims.json
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist submitted claims across restarts.
+      - claims-data:/app/state
+    entrypoint: >
+      sh -c "[ -f /app/state/mock_claims.json ] || cp /app/data/mock_claims.json /app/state/ &&
+             exec uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # lets the container reach a host Ollama
+
+  # frontend: added in the next step
+
+volumes:
+  claims-data:

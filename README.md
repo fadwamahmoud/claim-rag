@@ -6,13 +6,12 @@ This is a prototype customer assistant for OmniCare Financial. It can:
 2. Look up the status of a claim (`get_claim_status`).
 3. Submit a new claim (`submit_claim`). Input is validated with Pydantic and the claim is appended to `mock_claims.json`.
 
-> Status: the **backend** is done (FastAPI + LangGraph agent + Chroma RAG + tools + tests).
-> The **frontend** comes next.
+It has a Streamlit chat UI (`frontend/`) and a FastAPI + LangGraph backend (`backend/`).
 
 ## Architecture
 
 ```
-[ Web UI (Streamlit) ]            (next step)
+[ Web UI (Streamlit) ]  frontend/app.py   chat history, tool-call + source expanders
           │  HTTP  POST /api/v1/chat
           ▼
 [ FastAPI backend ]  app/api/routes.py
@@ -64,20 +63,35 @@ After each turn, the API returns `response` (the final AI message), `sources` (c
 ```bash
 cp backend/.env.example backend/.env    # add a free GROQ_API_KEY (or switch to Ollama)
 docker compose up --build
-curl localhost:8000/api/v1/health
 ```
 
-### Local
+- Chat UI: http://localhost:8501
+- API docs: http://localhost:8000/docs
+
+### Local (two terminals)
 
 ```bash
+# Terminal 1: backend
 cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
 cp .env.example .env                    # add your key
 uvicorn app.main:app --reload
+
+# Terminal 2: frontend
+cd frontend
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements-dev.txt
+streamlit run app.py                    # BACKEND_URL defaults to http://localhost:8000
 ```
 
-Interactive API docs are at http://localhost:8000/docs.
+### Using the UI
+
+- Type a question, or click one of the **Try asking** examples in the sidebar.
+- Under each answer, **🔎 / 📋 / 📝** expanders show each tool the agent called, with its arguments and
+  result. **📚 Sources** lists the policy sections that were retrieved.
+- The backend keeps conversation memory per **User ID**. That's how a claim can be filed over several
+  messages. **New conversation** clears the chat and switches to a fresh user ID, so the agent starts clean.
 
 ### Configuration
 
@@ -123,9 +137,10 @@ Example response:
 
 ```bash
 cd backend && pytest
+cd frontend && pytest     # API client: payload, reply parsing, 422/502/unreachable handling, health
 ```
 
-The tests run fully offline. A scripted fake chat model drives the real LangGraph graph, and the
+The backend tests run fully offline. A scripted fake chat model drives the real LangGraph graph, and the
 RAG tests use the `hashing` embedder. The suite covers:
 
 - **Endpoints**: health, chat, validation errors, 502 on LLM failure, per-user memory, the injection block.
@@ -152,5 +167,9 @@ backend/
     safety/guardrails.py
   data/                sample_policy.md, mock_claims.json
   tests/
-docker-compose.yml
+frontend/
+  app.py               Streamlit chat UI
+  api_client.py        HTTP client for the backend (no Streamlit, unit-tested)
+  tests/
+docker-compose.yml     backend :8000 + frontend :8501 (frontend waits for a healthy backend)
 ```

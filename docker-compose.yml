@@ -15,7 +15,15 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"  # lets the container reach a host Ollama
 
-  # frontend: added in the next step
+  frontend:
+    build: ./frontend
+    environment:
+      BACKEND_URL: http://backend:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   claims-data:

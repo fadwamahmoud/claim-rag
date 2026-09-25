@@ -29,6 +29,11 @@ class Settings(BaseSettings):
     policy_docs_dir: Path = DATA_DIR
     chroma_persist_dir: Path | None = None  # None = in-memory index
     retrieval_k: int = 3
+    # Relevance filtering (cosine relevance, 0-1). Calibrated for bge-small on the sample policy:
+    # relevant top hits score ~0.61-0.80, off-topic queries <=0.54. Unrelated sections trail the
+    # top hit by >=0.11, while genuinely co-relevant sections trail it by <=0.05.
+    retrieval_min_score: float = 0.55
+    retrieval_max_gap: float = 0.08
 
     # --- Tools -----------------------------------------------------------
     claims_db_path: Path = DATA_DIR / "mock_claims.json"

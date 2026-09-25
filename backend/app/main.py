@@ -21,7 +21,13 @@ def build_agent(settings: Settings) -> ClaimsAgent:
     store = PolicyStore(build_embeddings(settings), settings.chroma_persist_dir)
     count = store.ingest(settings.policy_docs_dir)
     logger.info("Indexed %d policy chunks from %s", count, settings.policy_docs_dir)
-    tools = build_tools(store, ClaimsRepository(settings.claims_db_path), settings.retrieval_k)
+    tools = build_tools(
+        store,
+        ClaimsRepository(settings.claims_db_path),
+        retrieval_k=settings.retrieval_k,
+        min_score=settings.retrieval_min_score,
+        max_gap=settings.retrieval_max_gap,
+    )
     return ClaimsAgent(build_llm(settings), tools)
 
 

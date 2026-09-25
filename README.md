@@ -101,6 +101,8 @@ streamlit run app.py                    # BACKEND_URL defaults to http://localho
 | `LLM_MODEL` | `openai/gpt-oss-120b` | Any tool-calling model from that provider |
 | `EMBEDDING_BACKEND` | `fastembed` | `hashing` is a lexical embedder for offline use and tests |
 | `CLAIMS_DB_PATH` | `backend/data/mock_claims.json` | Docker uses a named volume, so claims persist across restarts |
+| `RETRIEVAL_MIN_SCORE` | `0.55` | Drop policy chunks below this cosine relevance, so off-topic questions get no sources |
+| `RETRIEVAL_MAX_GAP` | `0.08` | Drop chunks scoring more than this below the best hit, so only the relevant sections are cited |
 | `CHROMA_PERSIST_DIR` | unset (in-memory) | The policy is re-indexed on every startup |
 
 ## Sample requests

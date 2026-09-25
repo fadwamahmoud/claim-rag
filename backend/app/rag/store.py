@@ -69,8 +69,16 @@ class PolicyStore:
             self._db.add_documents(chunks, ids=ids)
         return len(chunks)
 
-    def search(self, query: str, k: int = 3) -> list[RetrievedChunk]:
+    def search(self, query: str, k: int = 3, min_score: float = 0.0, max_gap: float = 1.0) -> list[RetrievedChunk]:
+        """Top-k chunks, dropping any below `min_score` or more than `max_gap` below the best hit.
+
+        The absolute floor removes off-topic matches; the relative gap removes sections that are
+        merely "less wrong" than the real answer, while keeping several when they score alike.
+        """
         results = self._db.similarity_search_with_relevance_scores(query, k=k)
+        if not results:
+            return []
+        floor = max(min_score, max(score for _, score in results) - max_gap)
         return [
             RetrievedChunk(
                 content=doc.page_content,
@@ -79,4 +87,5 @@ class PolicyStore:
                 score=round(score, 4),
             )
             for doc, score in results
+            if score >= floor
         ]

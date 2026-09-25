@@ -34,9 +34,15 @@ def _validation_error(exc: ValidationError) -> str:
     return json.dumps({"ok": False, "error": "validation_error", "details": problems})
 
 
-def build_tools(policy_store: PolicyStore, claims: ClaimsRepository, retrieval_k: int = 3) -> list[BaseTool]:
+def build_tools(
+    policy_store: PolicyStore,
+    claims: ClaimsRepository,
+    retrieval_k: int = 3,
+    min_score: float = 0.0,
+    max_gap: float = 1.0,
+) -> list[BaseTool]:
     def search_policy(query: str) -> tuple[str, list[dict]]:
-        chunks = policy_store.search(query, k=retrieval_k)
+        chunks = policy_store.search(query, k=retrieval_k, min_score=min_score, max_gap=max_gap)
         if not chunks:
             return "No relevant policy sections found.", []
         blocks = [f"[{i}] ({c.citation})\n{c.content}" for i, c in enumerate(chunks, start=1)]

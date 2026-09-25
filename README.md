@@ -84,7 +84,7 @@ Interactive API docs are at http://localhost:8000/docs.
 | Variable | Default | Notes |
 |---|---|---|
 | `LLM_PROVIDER` | `groq` | `groq`, `openai`, `anthropic`, or `ollama` |
-| `LLM_MODEL` | `llama-3.3-70b-versatile` | Any tool-calling model from that provider |
+| `LLM_MODEL` | `openai/gpt-oss-120b` | Any tool-calling model from that provider |
 | `EMBEDDING_BACKEND` | `fastembed` | `hashing` is a lexical embedder for offline use and tests |
 | `CLAIMS_DB_PATH` | `backend/data/mock_claims.json` | Docker uses a named volume, so claims persist across restarts |
 | `CHROMA_PERSIST_DIR` | unset (in-memory) | The policy is re-indexed on every startup |

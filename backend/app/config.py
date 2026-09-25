@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     # Any provider supported by langchain's `init_chat_model`
     # (groq, openai, anthropic, ollama). Groq and Ollama are free options.
     llm_provider: Literal["groq", "openai", "anthropic", "ollama"] = "groq"
-    llm_model: str = "llama-3.3-70b-versatile"
+    llm_model: str = "openai/gpt-oss-120b"
     llm_temperature: float = 0.0
     ollama_base_url: str = "http://localhost:11434"
 

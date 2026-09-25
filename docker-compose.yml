@@ -1,9 +1,7 @@
 services:
   backend:
     build: ./backend
-    env_file:
-      - path: ./backend/.env
-        required: false
+    env_file: ./backend/.env  # create from backend/.env.example
     environment:
       CLAIMS_DB_PATH: /app/state/mock_claims.json
     ports:
